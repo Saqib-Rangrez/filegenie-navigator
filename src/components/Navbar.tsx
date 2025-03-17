@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Clock, Menu, X, MessageSquare } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface NavbarProps {
   className?: string;
@@ -171,6 +172,7 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
           >
             <Clock className="h-5 w-5" />
           </Button>
+          <ThemeToggle />
           <div className="h-4 border-r border-border mx-1" />
           <Link to="/login" className="navbar-link">
             Log in
@@ -247,6 +249,7 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
                   <Clock className="h-4 w-4 mr-2" />
                   <span>History</span>
                 </Button>
+                <ThemeToggle />
               </div>
               
               <div className="flex items-center space-x-2">
