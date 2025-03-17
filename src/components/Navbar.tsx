@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Clock, Menu, X } from "lucide-react";
+import { Search, Clock, Menu, X, MessageSquare } from "lucide-react";
 
 interface NavbarProps {
   className?: string;
@@ -153,6 +153,16 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
 
         {/* Auth and History buttons */}
         <div className="hidden md:flex items-center space-x-1">
+          <Link to="/dashboard">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="text-foreground/80 hover:text-foreground"
+              title="Go to Chat"
+            >
+              <MessageSquare className="h-5 w-5" />
+            </Button>
+          </Link>
           <Button 
             variant="ghost" 
             size="icon"
@@ -216,15 +226,28 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
             </div>
             
             <div className="flex items-center justify-between pt-2">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="text-foreground/80 hover:text-foreground flex items-center"
-                title="View Chat History"
-              >
-                <Clock className="h-4 w-4 mr-2" />
-                <span>History</span>
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Link to="/dashboard">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-foreground/80 hover:text-foreground flex items-center"
+                    title="Go to Chat"
+                  >
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    <span>Chat</span>
+                  </Button>
+                </Link>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-foreground/80 hover:text-foreground flex items-center"
+                  title="View Chat History"
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  <span>History</span>
+                </Button>
+              </div>
               
               <div className="flex items-center space-x-2">
                 <Link to="/login">
