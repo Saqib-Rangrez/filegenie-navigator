@@ -1,12 +1,15 @@
 
 import React from "react";
 import ChatInterface from "@/components/ChatInterface";
+import { HistoryProvider } from "@/contexts/HistoryContext";
 
 const Dashboard: React.FC = () => {
   return (
-    <div className="container py-6">
-      <ChatInterface />
-    </div>
+    <HistoryProvider>
+      <div className="container py-6">
+        <ChatInterface />
+      </div>
+    </HistoryProvider>
   );
 };
 

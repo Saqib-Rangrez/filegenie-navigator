@@ -1,20 +1,25 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { MessageSquareDashed } from "lucide-react";
+import { MessageSquareDashed, Clock } from "lucide-react";
 import FileUpload from "./FileUpload";
 import CollectionSelector from "./CollectionSelector";
 import ChatMessage, { Message } from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import HistorySidebar from "./HistorySidebar";
+import { useHistory } from "@/contexts/HistoryContext";
 
 const ChatInterface: React.FC = () => {
   const [collections, setCollections] = useState<string[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isHistorySidebarOpen, setIsHistorySidebarOpen] = useState(false);
   const { toast } = useToast();
+  const { addToHistory } = useHistory();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to the bottom of messages when messages change
@@ -61,6 +66,9 @@ const ChatInterface: React.FC = () => {
       timestamp: new Date(),
     };
 
+    // Add to history
+    addToHistory(content, selectedCollection);
+
     // Add loading message for the assistant
     const loadingMessageId = uuidv4();
     const loadingMessage: Message = {
@@ -105,68 +113,92 @@ const ChatInterface: React.FC = () => {
     }
   };
 
+  const toggleHistorySidebar = () => {
+    setIsHistorySidebarOpen(!isHistorySidebarOpen);
+  };
+
   return (
-    <div className="grid h-[calc(100vh-9rem)] grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4">
-      {/* Sidebar */}
-      <div className="flex flex-col space-y-6 md:col-span-1">
-        <FileUpload onUploadComplete={handleUploadComplete} />
-        
-        {collections.length > 0 && (
-          <CollectionSelector
-            collections={collections}
-            selectedCollection={selectedCollection}
-            onSelect={setSelectedCollection}
-          />
-        )}
-      </div>
-
-      {/* Chat Area */}
-      <div className="flex flex-col rounded-lg border bg-card/20 md:col-span-2 lg:col-span-3">
-        <div className="flex items-center gap-2 border-b p-4">
-          <MessageSquareDashed className="h-5 w-5 text-primary" />
-          <h2 className="font-medium">
-            {selectedCollection
-              ? `Chat with ${selectedCollection}`
-              : "Upload a document to start chatting"}
-          </h2>
+    <>
+      <div className="grid h-[calc(100vh-9rem)] grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4">
+        {/* Sidebar */}
+        <div className="flex flex-col space-y-6 md:col-span-1">
+          <FileUpload onUploadComplete={handleUploadComplete} />
+          
+          {collections.length > 0 && (
+            <CollectionSelector
+              collections={collections}
+              selectedCollection={selectedCollection}
+              onSelect={setSelectedCollection}
+            />
+          )}
         </div>
 
-        {/* Messages Area */}
-        <ScrollArea className="flex-1">
-          <div className="flex flex-col divide-y">
-            {messages.length > 0 ? (
-              messages.map((message) => (
-                <ChatMessage key={message.id} message={message} />
-              ))
-            ) : (
-              <div className="flex flex-1 flex-col items-center justify-center p-12 text-center">
-                <div className="rounded-full bg-muted/50 p-4">
-                  <MessageSquareDashed className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="mt-4 text-lg font-medium">No messages yet</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Upload a document and start asking questions to get insights from your files.
-                </p>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
+        {/* Chat Area */}
+        <div className="flex flex-col rounded-lg border bg-card/20 md:col-span-2 lg:col-span-3">
+          <div className="flex items-center justify-between gap-2 border-b p-4">
+            <div className="flex items-center gap-2">
+              <MessageSquareDashed className="h-5 w-5 text-primary" />
+              <h2 className="font-medium">
+                {selectedCollection
+                  ? `Chat with ${selectedCollection}`
+                  : "Upload a document to start chatting"}
+              </h2>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleHistorySidebar}
+              title="View history"
+              className="text-foreground/80 hover:text-foreground"
+            >
+              <Clock className="h-5 w-5" />
+            </Button>
           </div>
-        </ScrollArea>
 
-        {/* Input Area */}
-        <div className="border-t p-4">
-          <ChatInput
-            onSend={handleSendMessage}
-            disabled={!selectedCollection || isProcessing}
-            placeholder={
-              !selectedCollection
-                ? "Please select a document collection first..."
-                : "Ask a question about your document..."
-            }
-          />
+          {/* Messages Area */}
+          <ScrollArea className="flex-1">
+            <div className="flex flex-col divide-y">
+              {messages.length > 0 ? (
+                messages.map((message) => (
+                  <ChatMessage key={message.id} message={message} />
+                ))
+              ) : (
+                <div className="flex flex-1 flex-col items-center justify-center p-12 text-center">
+                  <div className="rounded-full bg-muted/50 p-4">
+                    <MessageSquareDashed className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-medium">No messages yet</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Upload a document and start asking questions to get insights from your files.
+                  </p>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+
+          {/* Input Area */}
+          <div className="border-t p-4">
+            <ChatInput
+              onSend={handleSendMessage}
+              disabled={!selectedCollection || isProcessing}
+              placeholder={
+                !selectedCollection
+                  ? "Please select a document collection first..."
+                  : "Ask a question about your document..."
+              }
+            />
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* History Sidebar */}
+      <HistorySidebar 
+        open={isHistorySidebarOpen} 
+        onClose={() => setIsHistorySidebarOpen(false)} 
+        collections={collections}
+      />
+    </>
   );
 };
 
