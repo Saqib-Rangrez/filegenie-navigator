@@ -29,6 +29,11 @@ const Index = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
+            <Link to="/dashboard">
+              <Button variant="outline" size="lg" className="font-medium">
+                Try Dashboard
+              </Button>
+            </Link>
             <Link to="/login">
               <Button variant="outline" size="lg" className="font-medium">
                 Log in
